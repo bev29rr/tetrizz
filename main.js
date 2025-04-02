@@ -1,12 +1,12 @@
-import { initDisplay, drawGrid } from "./modules/canvas"; 
+import { initDisplay, drawGrid, drawPieces } from "./modules/canvas.js"; 
 
 document.addEventListener('DOMContentLoaded', () => {
     const canvas = initDisplay('canvas');
+    const ctx = canvas.getContext('2d');
+    const gridSize = 12;
 
-    /*
-    ctx.moveTo(0, 0);
-    ctx.lineTo(canvas.width, canvas.height);
-    ctx.stroke();
-    */
-    drawGrid(canvas.getContext('2d'), 12, 12);
+    let grid = new Array(gridSize).fill(null).map(() => new Array(gridSize).fill(null));
+
+    drawPieces(canvas, ctx, grid);
+    drawGrid(canvas, ctx, gridSize, gridSize);
 });

@@ -5,7 +5,7 @@ export function initDisplay(id) {
     return canvas;
 }
 
-export function drawGrid(ctx, rows, cols) {
+export function drawGrid(canvas, ctx, rows, cols) {
     ctx.strokeStyle = "black";
     const cellSize = canvas.height / rows;
 
@@ -25,3 +25,21 @@ export function drawGrid(ctx, rows, cols) {
         ctx.stroke();
     }
 }
+
+export function drawPieces(canvas, ctx, grid) {
+    const cellSize = canvas.height / grid.length;
+    ctx.fillStyle = 'red';
+    for (let i = 0; i < grid.length; i++) {
+        for (let j = 0; j < grid.length; j++) {
+            const currentTileCol = grid[i][j];
+            if (currentTileCol === null) continue;
+            ctx.fillStyle = currentTileCol;
+            const [x, y] = getCellPos(i, j, cellSize);
+            ctx.fillRect(x, y, cellSize, cellSize);
+        }
+    }
+}
+
+function getCellPos(x, y, cellSize) {
+    return [x * cellSize, y * cellSize];
+}   
