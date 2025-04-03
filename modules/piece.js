@@ -21,7 +21,7 @@ const colors = [
     'lightblue'
 ];
 
-// https://stackoverflow.com/questions/5915096/get-a-random-item-from-a-javascript-array
+// randomArr function: https://stackoverflow.com/questions/5915096/get-a-random-item-from-a-javascript-array
 function randomArr(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }

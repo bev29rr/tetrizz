@@ -1,3 +1,5 @@
+import { placePieceOnGrid } from "./piece.js";
+
 export function initDisplay(id) {
     const canvas = document.getElementById(id);
     canvas.height = window.innerHeight;
@@ -38,6 +40,14 @@ export function drawPieces(canvas, ctx, grid) {
             ctx.fillRect(x, y, cellSize, cellSize);
         }
     }
+}
+
+export function screenUpdate(canvas, ctx, grid, piece, pieceColor) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    let pieceGrid = placePieceOnGrid(grid, piece, pieceColor);
+
+    drawPieces(canvas, ctx, pieceGrid);
+    drawGrid(canvas, ctx, grid.length, grid.length);
 }
 
 function getCellPos(x, y, cellSize) {

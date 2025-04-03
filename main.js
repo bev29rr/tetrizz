@@ -1,55 +1,64 @@
-import { initDisplay, drawGrid, drawPieces } from "./modules/canvas.js"; 
+import { initDisplay, drawGrid, drawPieces, screenUpdate } from "./modules/canvas.js"; 
 import { placePieceOnGrid, randomPiece, randomColor, pieceTranspose, pieceDown } from "./modules/piece.js";
+import { moveLeft } from "./modules/input.js";
 
 const FALL_TIME = 100;
 
-function pieceDrop(canvas, ctx, gridSize, grid, piece, color) {
+// keypressed has to be global
+const keypressed = {
+    'key': '',
+    'lastTick': 0
+};
+
+function pieceDrop(canvas, ctx, grid, piece, color) {
     let newPiece = pieceDown(grid, piece);
+    console.log(newPiece);
 
     if (newPiece === false) return false;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    let pieceGrid = placePieceOnGrid(grid, newPiece, color);
-
-    drawPieces(canvas, ctx, pieceGrid);
-    drawGrid(canvas, ctx, gridSize, gridSize);
+    
+    screenUpdate(canvas, ctx, grid, piece, color);
     return newPiece;
 }
 
 // piece animate is better as a promise as it needs to Promise<piece>
-function pieceAnimateDrop(canvas, ctx, gridSize, grid, currentPiece, color) {
+function pieceAnimateDrop(canvas, ctx, grid, currentPiece, color) {
     return new Promise((resolve) => {
         let tick = 0;
         // tick allows for immediate change of direction of tile
         // however, it is very expensive
-        function animate(piece, tick) {
+        function tickPieceDrop(piece, tick) {
             if (tick >= FALL_TIME) {
-                let pieceResult = pieceDrop(canvas, ctx, gridSize, grid, piece, color);
+                let pieceResult = pieceDrop(canvas, ctx, grid, piece, color);
 
                 if (pieceResult === false) {
                     resolve(piece); 
                 } else {
                     let newPiece = pieceResult;
-
-                    setTimeout(() => animate(newPiece, 0), 10);
+                    setTimeout(() => tickPieceDrop(newPiece, 0), 10);
                 }
             } else {
-                setTimeout(() => animate(piece, tick+1), 10);
+                if (keypressed['key'] === 'left') {
+                    if (Date.now() - keypressed['lastTick'] > 100) {
+                        piece = moveLeft(piece);
+                        keypressed['lastTick'] = Date.now();
+                        // screenUpdate(canvas, ctx, grid, piece, color);
+                    }
+                }
+                setTimeout(() => tickPieceDrop(piece, tick+1), 10);
             }
         }
-        animate(currentPiece, tick);
+        tickPieceDrop(currentPiece, tick);
     });
 }
 
-async function gameAnimate(canvas, ctx, gridSize, grid) {
+async function gameAnimate(canvas, ctx, grid) {
     return new Promise(async(resolve) => {
         let currentPiece = pieceTranspose([5, 0], randomPiece());
         let currentColor = randomColor();
 
-        let pieceGrid = placePieceOnGrid(grid, currentPiece, currentColor);    
-        drawPieces(canvas, ctx, pieceGrid);
-        drawGrid(canvas, ctx, gridSize, gridSize);
+        screenUpdate(canvas, ctx, grid, currentPiece, currentColor);
 
-        let newPiece = await pieceAnimateDrop(canvas, ctx, gridSize, grid, currentPiece, currentColor);
+        let newPiece = await pieceAnimateDrop(canvas, ctx, grid, currentPiece, currentColor);
         console.log("newPiece:", newPiece);
     });
 }
@@ -61,14 +70,22 @@ function webTetrizz() {
 
     let grid = new Array(gridSize).fill(null).map(() => new Array(gridSize).fill(null));
 
-    gameAnimate(canvas, ctx, gridSize, grid);
+    gameAnimate(canvas, ctx, grid);
 }
 
 document.addEventListener('keydown', (e) => {
     if (e.code === "ArrowLeft") {
-        console.log('1');
+        keypressed['key'] = 'left';
+        keypressed['tick'] = Date.now();
     } else if (e.code === "ArrowRight") {
-        console.log('2');
+        keypressed['key'] = 'right';
+        keypressed['tick'] =  Date.now();
+    }
+});
+
+document.addEventListener("keyup", (e) => {
+    if (e.code === "ArrowLeft" || e.code === "ArrowRight") {
+        keypressed['key'] = "";
     }
 });
 
