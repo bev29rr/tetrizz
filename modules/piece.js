@@ -1,6 +1,9 @@
 // Personally, I would make this an object called piece and all of these would be methods
 
-function checkSquare(grid, position) {
+export function checkSquare(grid, position) {
+    if (grid.length < position[0]) return false;
+    if (grid[position[0]] === undefined || grid[position[0]].length <= position[1]) return false;
+    
     if (grid[position[0]][position[1]] === null) { 
         return true;
     } else { 
@@ -39,7 +42,8 @@ export function randomColor() {
 
 // move a piece a certain x and y
 export function pieceTranspose(position, piece) {
-    piece = piece.map(([x, y]) => [ x + position[0], y + position[1] ]);
+    piece = [...piece]
+        .map(([x, y]) => [ x + position[0], y + position[1] ]);
     return piece;
 }
 
@@ -55,10 +59,11 @@ export function placePieceOnGrid(grid, piece, color) {
 
 export function pieceDown(grid, piece) {
     for (let i = 0; i < piece.length; i++) {
+        console.log(checkSquare(grid, piece[i]));
         if (!checkSquare(grid, piece[i])) return false;
     }
 
-    return pieceTranspose([0, 1], piece)
+    return pieceTranspose([0, 1], piece);
 }
 
 // left parameter is bool and if true, piece is rotated left; if false, piece is rotated right
