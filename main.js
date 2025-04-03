@@ -1,8 +1,8 @@
 import { initDisplay, drawGrid, drawPieces, screenUpdate } from "./modules/canvas.js"; 
 import { placePieceOnGrid, randomPiece, randomColor, pieceTranspose, pieceDown } from "./modules/piece.js";
-import { moveLeft } from "./modules/input.js";
+import { moveLeft, moveRight } from "./modules/input.js";
 
-const FALL_TIME = 100;
+const FALL_TIME = 50;
 
 // keypressed has to be global
 const keypressed = {
@@ -26,6 +26,20 @@ function pieceAnimateDrop(canvas, ctx, grid, currentPiece, color) {
         // tick allows for immediate change of direction of tile
         // however, it is very expensive
         function tickPieceDrop(piece, tick) {
+            if (keypressed['key'] === 'left') {
+                if (Date.now() - keypressed['lastTick'] > 100) {
+                    piece = moveLeft(grid, piece);
+                    keypressed['lastTick'] = Date.now();
+                    screenUpdate(canvas, ctx, grid, piece, color);
+                }
+            } else if (keypressed['key'] === 'right') {
+                if (Date.now() - keypressed['lastTick'] > 100) {
+                    piece = moveRight(grid, piece);
+                    keypressed['lastTick'] = Date.now();
+                    screenUpdate(canvas, ctx, grid, piece, color);
+                }
+            }
+
             if (tick >= FALL_TIME) {
                 let pieceResult = pieceDrop(canvas, ctx, grid, piece, color);
 
@@ -36,12 +50,6 @@ function pieceAnimateDrop(canvas, ctx, grid, currentPiece, color) {
                     setTimeout(() => tickPieceDrop(newPiece, 0), 10);
                 }
             } else {
-                if (keypressed['key'] === 'left') {
-                    if (keypressed['lastTick'] - Date.now() > 100) {
-                        piece = moveLeft(piece);
-                        keypressed['lastTick'] = Date.now();
-                    }
-                }
                 setTimeout(() => tickPieceDrop(piece, tick+1), 10);
             }
         }
@@ -51,13 +59,18 @@ function pieceAnimateDrop(canvas, ctx, grid, currentPiece, color) {
 
 async function gameAnimate(canvas, ctx, grid) {
     return new Promise(async(resolve) => {
-        let currentPiece = pieceTranspose([5, 0], randomPiece());
-        let currentColor = randomColor();
+        async function tickGame(grid) {
+            let currentPiece = pieceTranspose([5, 0], randomPiece());
+            let currentColor = randomColor();
 
-        screenUpdate(canvas, ctx, grid, currentPiece, currentColor);
+            screenUpdate(canvas, ctx, grid, currentPiece, currentColor);
 
-        let newPiece = await pieceAnimateDrop(canvas, ctx, grid, currentPiece, currentColor);
-        console.log("newPiece:", newPiece);
+            let newPiece = await pieceAnimateDrop(canvas, ctx, grid, currentPiece, currentColor);
+            console.log("newPiece:", newPiece);
+            let newGrid = placePieceOnGrid(grid, newPiece, currentColor);
+            tickGame(newGrid);
+        }
+        tickGame(grid);
     });
 }
 
@@ -74,10 +87,11 @@ function webTetrizz() {
 document.addEventListener('keydown', (e) => {
     if (e.code === "ArrowLeft") {
         keypressed['key'] = 'left';
-        keypressed['tick'] = Date.now();
     } else if (e.code === "ArrowRight") {
         keypressed['key'] = 'right';
-        keypressed['tick'] =  Date.now();
+    } else if (e.code === "ArrowDown") {
+        keypressed['key'] = 'down';
+        // TODO: implement speed
     }
 });
 

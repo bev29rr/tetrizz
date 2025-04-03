@@ -1,8 +1,10 @@
 // Personally, I would make this an object called piece and all of these would be methods
 
 export function checkSquare(grid, position) {
-    if (position[0] >= grid.length || position[1] >= grid[0].length) return false;
-    return grid[position[0]][position[1]] === null;
+    if (!Array.isArray(position)) return false;
+    const [x, y] = position;
+    if (x < 0 || x >= grid.length || y < 0 || y >= grid.length) return false;
+    return grid[x][y] === null;
 }
 
 const pieces = [
@@ -14,11 +16,16 @@ const pieces = [
 ];
 
 const colors = [
-    'red',
-    'green',
-    'blue',
-    'yellow',
-    'lightblue'
+    "#FF5733",
+    "#33FF57", 
+    "#3357FF", 
+    "#FFD700", 
+    "#87CEEB", 
+    "#FF33A8",
+    "#A833FF",
+    "#33FFF5",
+    "#FF8C33",
+    "#4B0082"
 ];
 
 // randomArr function: https://stackoverflow.com/questions/5915096/get-a-random-item-from-a-javascript-array
