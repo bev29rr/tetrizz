@@ -12,11 +12,10 @@ const keypressed = {
 
 function pieceDrop(canvas, ctx, grid, piece, color) {
     let newPiece = pieceDown(grid, piece);
-    console.log(newPiece);
 
     if (newPiece === false) return false;
-    
-    screenUpdate(canvas, ctx, grid, piece, color);
+
+    screenUpdate(canvas, ctx, grid, newPiece, color);
     return newPiece;
 }
 
@@ -38,10 +37,9 @@ function pieceAnimateDrop(canvas, ctx, grid, currentPiece, color) {
                 }
             } else {
                 if (keypressed['key'] === 'left') {
-                    if (Date.now() - keypressed['lastTick'] > 100) {
+                    if (keypressed['lastTick'] - Date.now() > 100) {
                         piece = moveLeft(piece);
                         keypressed['lastTick'] = Date.now();
-                        // screenUpdate(canvas, ctx, grid, piece, color);
                     }
                 }
                 setTimeout(() => tickPieceDrop(piece, tick+1), 10);
