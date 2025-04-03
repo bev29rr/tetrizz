@@ -1,14 +1,8 @@
 // Personally, I would make this an object called piece and all of these would be methods
 
 export function checkSquare(grid, position) {
-    if (grid.length < position[0]) return false;
-    if (grid[position[0]] === undefined || grid[position[0]].length <= position[1]) return false;
-    
-    if (grid[position[0]][position[1]] === null) { 
-        return true;
-    } else { 
-        return false;
-    }
+    if (position[0] >= grid.length || position[1] >= grid[0].length) return false;
+    return grid[position[0]][position[1]] === null;
 }
 
 const pieces = [
@@ -49,21 +43,23 @@ export function pieceTranspose(position, piece) {
 
 export function placePieceOnGrid(grid, piece, color) {
     let bufferGrid = [...grid].map(row => [...row]);
-    for (let i = 0; i < piece.length; i++) {
-        for (let j = 0; j < piece[i].length; j++) {
-            bufferGrid[piece[i][0]][piece[i][1]] = color;
+
+    // easier iteration of coordinates
+    for (let [x, y] of piece) {
+        if (x >= 0 && x < bufferGrid.length && y >= 0 && y < bufferGrid[0].length) {
+            bufferGrid[x][y] = color;
         }
     }
     return bufferGrid;
 }
 
 export function pieceDown(grid, piece) {
+    let newPiece = pieceTranspose([0, 1], piece);
     for (let i = 0; i < piece.length; i++) {
-        console.log(checkSquare(grid, piece[i]));
-        if (!checkSquare(grid, piece[i])) return false;
+        if (!checkSquare(grid, newPiece[i])) return false;
     }
 
-    return pieceTranspose([0, 1], piece);
+    return newPiece;
 }
 
 // left parameter is bool and if true, piece is rotated left; if false, piece is rotated right
