@@ -1,6 +1,12 @@
 // Personally, I would make this an object called piece and all of these would be methods
 
-import { checkSquare } from "../main.js"; 
+function checkSquare(grid, position) {
+    if (grid[position[0]][position[1]] === null) { 
+        return true;
+    } else { 
+        return false;
+    }
+}
 
 const pieces = [
     [[0, 0], [0, 1], [0, 2], [1, 2]],
@@ -38,7 +44,7 @@ export function pieceTranspose(position, piece) {
 }
 
 export function placePieceOnGrid(grid, piece, color) {
-    let bufferGrid = grid.slice(0);
+    let bufferGrid = [...grid].map(row => [...row]);
     for (let i = 0; i < piece.length; i++) {
         for (let j = 0; j < piece[i].length; j++) {
             bufferGrid[piece[i][0]][piece[i][1]] = color;

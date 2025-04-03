@@ -1,12 +1,14 @@
 import { initDisplay, drawGrid, drawPieces } from "./modules/canvas.js"; 
 import { placePieceOnGrid, randomPiece, randomColor, pieceTranspose, pieceDown } from "./modules/piece.js";
 
-export function checkSquare(grid, position) {
-    if (grid[position[0]][position[1]] === null) { 
-        return true;
-    } else { 
-        return false;
-    }
+function pieceDrop(canvas, ctx, grid, piece, color) {
+    console.log('omg');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    piece = pieceDown(grid, piece);
+    let pieceGrid = placePieceOnGrid(grid, currentPiece, color);
+    
+    drawPieces(canvas, ctx, pieceGrid);
+    drawGrid(canvas, ctx, gridSize, gridSize);
 }
 
 function webTetrizz() {
@@ -16,26 +18,15 @@ function webTetrizz() {
 
     let grid = new Array(gridSize).fill(null).map(() => new Array(gridSize).fill(null));
     let currentPiece = pieceTranspose([5, 0], randomPiece());
-    console.log(grid);
-    let pieceGrid = placePieceOnGrid([...grid], currentPiece, randomColor());
-    //console.log(grid);
-    
-    //drawPieces(canvas, ctx, pieceGrid);
-    //drawGrid(canvas, ctx, gridSize, gridSize);
+    let currentColor = randomColor();
 
-    /* 
-    setTimeout(() => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        //console.log(currentPiece, grid);
-        currentPiece = pieceDown(grid, currentPiece);
-        //console.log(currentPiece);
-        let pieceGrid = placePieceOnGrid(grid, currentPiece, randomColor());
-        
-        drawPieces(canvas, ctx, pieceGrid);
-        drawGrid(canvas, ctx, gridSize, gridSize);
-    }, 1000); */
+    let pieceGrid = placePieceOnGrid(grid, currentPiece, randomColor());    
+    drawPieces(canvas, ctx, pieceGrid);
+    drawGrid(canvas, ctx, gridSize, gridSize);
+
+    setTimeout(pieceDrop, 1000, canvas, ctx, grid, currentPiece, currentColor); 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     webTetrizz();
-});
+}, { once: true });
